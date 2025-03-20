@@ -1,0 +1,12 @@
+[package]
+name = "tbtesta"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+avian = "0.0.0"
+bevy = "0.15.3"
+bevy-inspector-egui = "0.29.1"
+bevy_flycam = "0.15.0"
+bevy_trenchbroom = "0.6.4"
+nil = "0.14.0"
