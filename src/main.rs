@@ -58,6 +58,11 @@ fn main() {
 			sensitivity: 0.00005,
 			speed: 6.,
 		})
+        .insert_resource(KeyBindings {
+            move_ascend: KeyCode::KeyE,
+            move_descend: KeyCode::KeyQ,
+            ..Default::default()
+        })
 		.add_plugins(TrenchBroomPlugin(
 			TrenchBroomConfig::new("TbTest")
 				.no_bsp_lighting(true)
