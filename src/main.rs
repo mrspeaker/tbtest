@@ -88,7 +88,7 @@ fn setup_scene(
 	asset_server: Res<AssetServer>,
 	mut projection_query: Query<&mut Projection>,
 ) {
-	commands.spawn(SceneRoot(asset_server.load("maps/map-01.map#Scene")));
+	commands.spawn(SceneRoot(asset_server.load("maps/map01.map#Scene")));
 
 	// Wide FOV
 	for mut projection in &mut projection_query {
