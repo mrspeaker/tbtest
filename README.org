@@ -1,5 +1,4 @@
 * Bevy Trenchbroom test
 
-[[./tb.png]]
-
+[[./tb.jpg]]
 

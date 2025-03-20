@@ -95,7 +95,8 @@
 // entity 2
 {
 "classname" "cube"
-"origin" "-152 -56 -8"
+"origin" "-152 -56 8"
+"scale" "1 1 2.5"
 }
 // entity 3
 {
@@ -106,4 +107,10 @@
 {
 "classname" "light"
 "origin" "8 24 72"
+"_color" "0.2 1 1 1"
+}
+// entity 5
+{
+"classname" "info_player_start"
+"origin" "-232 88 -24"
 }

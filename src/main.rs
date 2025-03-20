@@ -1,32 +1,26 @@
-use bevy::math::*;
 use bevy::{
 	ecs::{component::ComponentId, world::DeferredWorld},
 	prelude::*,
+    math::*
 };
 use bevy_flycam::prelude::*;
 use bevy_trenchbroom::prelude::*;
 use nil::prelude::*;
 use std::f32::consts::*;
 
-// TODO: We aren't using inventory to register here because it's broken on wasm.
-
-#[derive(SolidClass, Component, Reflect)]
-#[no_register]
+// The required worldspawn class makes up the main structural
+// world geometry and settings. Exactly one exists in every map.
+#[derive(SolidClass, Component, Reflect, Default)]
 #[reflect(Component)]
-#[geometry(GeometryProvider::new().smooth_by_default_angle().render())]
-pub struct Worldspawn;
-
-#[derive(SolidClass, Component, Reflect)]
-#[no_register]
-#[reflect(Component)]
-#[require(Transform)]
-#[geometry(GeometryProvider::new().smooth_by_default_angle().render())]
-pub struct FuncDoor;
+#[geometry(GeometryProvider::new().smooth_by_default_angle())]
+pub struct Worldspawn {
+    pub fog_color: Color,
+    pub fog_density: f32,
+}
 
 #[derive(PointClass, Component, Reflect)]
-#[no_register]
 #[reflect(Component)]
-#[require(Transform)]
+#[require(Transform, Visibility)]
 #[component(on_add = Self::on_add)]
 pub struct Cube;
 impl Cube {
@@ -40,7 +34,6 @@ impl Cube {
 }
 
 #[derive(PointClass, Component, Reflect, Clone, Copy, SmartDefault)]
-#[no_register]
 #[reflect(Component)]
 #[require(Transform)]
 pub struct Light {
@@ -51,30 +44,24 @@ pub struct Light {
 }
 
 #[derive(PointClass, Component, Reflect, Clone, Copy, SmartDefault)]
-#[no_register]
 #[reflect(Component)]
 #[require(Transform)]
 pub struct InfoPlayerStart;
 
+const TB_CONFIG_LOCATION: &str = "/Applications/TrenchBroom.app/Contents/Resources/Games/TbTest";
+
 fn main() {
 	App::new()
-		.add_plugins(DefaultPlugins.set(ImagePlugin {
-			default_sampler: repeating_image_sampler(false),
-		}))
-		// bevy_flycam setup so we can get a closer look at the scene, mainly for debugging
+		.add_plugins(DefaultPlugins)
 		.add_plugins(PlayerPlugin)
 		.insert_resource(MovementSettings {
 			sensitivity: 0.00005,
 			speed: 6.,
 		})
-		.add_plugins(bevy_inspector_egui::quick::WorldInspectorPlugin::default())
 		.add_plugins(TrenchBroomPlugin(
 			TrenchBroomConfig::new("TbTest")
 				.no_bsp_lighting(true)
 				.register_class::<Worldspawn>()
-				.register_class::<Cube>()
-				.register_class::<Light>()
-				.register_class::<FuncDoor>(),
 		))
 		.add_systems(PostStartup, setup_scene)
 		.add_systems(Update, spawn_lights)
@@ -86,17 +73,8 @@ fn main() {
 fn setup_scene(
 	mut commands: Commands,
 	asset_server: Res<AssetServer>,
-	mut projection_query: Query<&mut Projection>,
 ) {
 	commands.spawn(SceneRoot(asset_server.load("maps/map01.map#Scene")));
-
-	// Wide FOV
-	for mut projection in &mut projection_query {
-		*projection = Projection::Perspective(PerspectiveProjection {
-			fov: 90_f32.to_radians(),
-			..default()
-		});
-	}
 
     // Sun light
     commands.spawn((
@@ -135,11 +113,10 @@ fn spawn_lights(
 	}
 }
 
+
+// Write out <folder_path>/GameConfig.cfg, <folder_path>/example_game.fgd
 fn write_trenchbroom_config(server: Res<TrenchBroomServer>) {
-    if let Err(err) = server.config.write_folder("/Applications/TrenchBroom.app/Contents/Resources/Games/TbTest") {
+    if let Err(err) = server.config.write_folder(TB_CONFIG_LOCATION) {
         error!("Could not write TrenchBroom config: {err}");
     }
-
-    // This will write <folder_path>/GameConfig.cfg,
-    // and <folder_path>/example_game.fgd
 }
